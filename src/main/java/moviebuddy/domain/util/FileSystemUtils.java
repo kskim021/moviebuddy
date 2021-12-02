@@ -1,4 +1,4 @@
-package moviebuddy.util;
+package moviebuddy.domain.util;
 
 import java.io.IOException;
 import java.net.URI;
@@ -6,7 +6,7 @@ import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.Collections;
 
-import moviebuddy.ApplicationException;
+import moviebuddy.domain.ApplicationException;
 
 /**
  * 파일시스템을 다루기 위한 유틸리티 클래스이다.

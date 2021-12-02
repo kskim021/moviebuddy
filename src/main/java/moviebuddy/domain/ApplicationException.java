@@ -1,4 +1,4 @@
-package moviebuddy;
+package moviebuddy.domain;
 
 /**
  * @author springrunner.kr@gmail.com

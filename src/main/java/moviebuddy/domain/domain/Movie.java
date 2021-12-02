@@ -1,4 +1,4 @@
-package moviebuddy;
+package moviebuddy.domain.domain;
 
 import java.net.URL;
 import java.time.LocalDate;
