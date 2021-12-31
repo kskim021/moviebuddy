@@ -1,16 +1,20 @@
-package moviebuddy.domain.domain;
+package moviebuddy.domain;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Service
 public class MovieFinder {
 
     /*private movieReader movieReader = new CsvMovieReader();*/
 
     private MovieReader movieReader;
 
-    public MovieFinder(MovieReader movieReader) {
+    public MovieFinder(@Qualifier("csvMovieReader") MovieReader movieReader) {
         this.movieReader = Objects.requireNonNull(movieReader);
     }
 

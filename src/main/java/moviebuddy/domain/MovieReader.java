@@ -1,4 +1,6 @@
-package moviebuddy.domain.domain;
+package moviebuddy.domain;
+
+import moviebuddy.domain.Movie;
 
 import java.util.List;
 

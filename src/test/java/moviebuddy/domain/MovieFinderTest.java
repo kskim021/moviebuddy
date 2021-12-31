@@ -1,24 +1,33 @@
 package moviebuddy.domain;
 
-import moviebuddy.domain.domain.Movie;
-import moviebuddy.domain.domain.MovieFinder;
+import moviebuddy.MovieBuddyFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.util.List;
 
 /**
  * @author springrunner.kr@gmail.com
  */
+@SpringJUnitConfig(MovieBuddyFactory.class)
+//@ExtendWith(SpringExtension.class)
+//@ContextConfiguration(classes = MovieBuddyFactory.class)
 public class MovieFinderTest {
 
-    ApplicationContext applicationContext = new AnnotationConfigApplicationContext(MovieBuddyFactory.class);
+    //ApplicationContext applicationContext = new AnnotationConfigApplicationContext(MovieBuddyFactory.class);
 
     MovieBuddyFactory movieBuddyFactory = new MovieBuddyFactory();
     //MovieFinder application = movieBuddyFactory.movieFinder();
-    MovieFinder application = applicationContext.getBean(MovieFinder.class);
+    //MovieFinder application = applicationContext.getBean(MovieFinder.class);
+
+    /*MovieFinderTest(MovieFinder movieFinder) {
+        this.application = movieFinder;
+    }*/
+
+    @Autowired
+    MovieFinder application;
 
     @Test
     void NotEmpty_directedBy() {
