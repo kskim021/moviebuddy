@@ -16,6 +16,8 @@ import java.util.stream.Stream;
 import moviebuddy.domain.domain.CsvMovieReader;
 import moviebuddy.domain.domain.Movie;
 import moviebuddy.domain.domain.MovieFinder;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
  * @author springrunner.kr@gmail.com
@@ -36,10 +38,13 @@ public class MovieBuddyApplication {
      */
 
     public void run(String[] args) throws Exception {
-        final MovieBuddyFactory movieBuddyFactory = new MovieBuddyFactory();
+
+        ApplicationContext movieBuddyFactory = new AnnotationConfigApplicationContext(MovieBuddyFactory.class);
+        // final MovieBuddyFactory movieBuddyFactory = new MovieBuddyFactory();
 
         //final MovieFinder movieFinder = new MovieFinder(new CsvMovieReader());
-        final MovieFinder movieFinder = movieBuddyFactory.movieFinder();
+        //final MovieFinder movieFinder = movieBuddyFactory.movieFinder();
+        final MovieFinder movieFinder = movieBuddyFactory.getBean(MovieFinder.class);
 
         final AtomicBoolean running = new AtomicBoolean(true);
         final BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
