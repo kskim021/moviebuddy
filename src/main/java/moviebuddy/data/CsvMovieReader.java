@@ -1,28 +1,28 @@
 package moviebuddy.data;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import moviebuddy.ApplicationException;
 import moviebuddy.MovieBuddyProfile;
 import moviebuddy.domain.Movie;
 import moviebuddy.domain.MovieReader;
-import moviebuddy.util.FileSystemUtils;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Profile(MovieBuddyProfile.CSV_MODE)
 @Repository
-public class CsvMovieReader extends AbstractFileSystemMovieReader implements MovieReader {
+public class CsvMovieReader extends AbstractMetadataResourceMovieReader implements MovieReader {
 
 
     /**
@@ -33,9 +33,16 @@ public class CsvMovieReader extends AbstractFileSystemMovieReader implements Mov
     @Override
     public List<Movie> loadMovies() {
 
+        /*Cache cache = cacheManager.getCache(getClass().getName());
+        List<Movie> movies = cache.get("csv.movies", List.class);
+        if(Objects.nonNull(movies) && movies.size() > 0) {
+
+        }*/
+
         try {
-            final URI resourceUri = ClassLoader.getSystemResource("movie_metadata.csv").toURI();
-            final Path data = Path.of(FileSystemUtils.checkFileSystem(resourceUri));
+            //final URI resourceUri = ClassLoader.getSystemResource("movie_metadata.csv").toURI();
+            //final Path data = Path.of(FileSystemUtils.checkFileSystem(resourceUri));
+            final InputStream content = getMetaResource().getInputStream();
             final Function<String, Movie> mapCsv = csv -> {
                 try {
                     // split with comma
@@ -57,12 +64,19 @@ public class CsvMovieReader extends AbstractFileSystemMovieReader implements Mov
                 }
             };
 
-            return Files.readAllLines(data, StandardCharsets.UTF_8)
-                    .stream()
+            return new BufferedReader(new InputStreamReader(content, StandardCharsets.UTF_8))
+                    .lines()
                     .skip(1)
                     .map(mapCsv)
                     .collect(Collectors.toList());
-        } catch (IOException | URISyntaxException error) {
+
+
+            /*return Files.readAllLines(data, StandardCharsets.UTF_8)
+                    .stream()
+                    .skip(1)
+                    .map(mapCsv)
+                    .collect(Collectors.toList());*/
+        } catch (IOException error) {
             throw new ApplicationException("failed to load movies data.", error);
         }
     }
