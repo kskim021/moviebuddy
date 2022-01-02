@@ -21,7 +21,7 @@ public class MovieFinderTest {
 
     //ApplicationContext applicationContext = new AnnotationConfigApplicationContext(MovieBuddyFactory.class);
 
-    MovieBuddyFactory movieBuddyFactory = new MovieBuddyFactory();
+    //MovieBuddyFactory movieBuddyFactory = new MovieBuddyFactory();
     //MovieFinder application = movieBuddyFactory.movieFinder();
     //MovieFinder application = applicationContext.getBean(MovieFinder.class);
 

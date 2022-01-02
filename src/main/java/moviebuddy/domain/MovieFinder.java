@@ -12,7 +12,7 @@ public class MovieFinder {
 
     /*private movieReader movieReader = new CsvMovieReader();*/
 
-    private MovieReader movieReader;
+    private final MovieReader movieReader;
 
     public MovieFinder(MovieReader movieReader) {
         this.movieReader = Objects.requireNonNull(movieReader);
