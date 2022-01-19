@@ -4,7 +4,6 @@ import moviebuddy.ApplicationException;
 import moviebuddy.MovieBuddyProfile;
 import moviebuddy.domain.Movie;
 import moviebuddy.domain.MovieReader;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
@@ -44,13 +43,6 @@ public class CsvMovieReader extends AbstractMetadataResourceMovieReader implemen
      */
     @Override
     public List<Movie> loadMovies() {
-        // 캐시에 저장된 데이터가 있으면, 즉시 반환한다.
-        Cache cache = cacheManager.getCache(getClass().getName());
-        //List<Movie> movies = cache.getIfPresent("csv.movies");
-        List<Movie> movies = cache.get("csv.movies", List.class);
-        if(Objects.nonNull(movies) && movies.size() > 0) {
-            return movies;
-        }
 
         try {
             //final URI resourceUri = ClassLoader.getSystemResource("movie_metadata.csv").toURI();
@@ -77,7 +69,7 @@ public class CsvMovieReader extends AbstractMetadataResourceMovieReader implemen
                 }
             };
 
-            movies =  new BufferedReader(new InputStreamReader(content, StandardCharsets.UTF_8))
+            return new BufferedReader(new InputStreamReader(content, StandardCharsets.UTF_8))
                     .lines()
                     .skip(1)
                     .map(mapCsv)
@@ -89,13 +81,10 @@ public class CsvMovieReader extends AbstractMetadataResourceMovieReader implemen
                     .skip(1)
                     .map(mapCsv)
                     .collect(Collectors.toList());*/
+
         } catch (IOException error) {
             throw new ApplicationException("failed to load movies data.", error);
         }
-
-        // 획득한 데이터를 캐시에 저장하고, 반환한다.
-        cache.put("csv.movies", movies);
-        return movies;
 
     }
 

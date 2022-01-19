@@ -1,6 +1,8 @@
 package moviebuddy;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import moviebuddy.data.CachingMovieReader;
+import moviebuddy.domain.MovieReader;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.*;
@@ -81,6 +83,13 @@ public class MovieBuddyFactory {
 
             return movieReader;
         }*/
+
+        @Primary
+        @Bean
+        public MovieReader cachingMovieReader(CacheManager cacheManager, MovieReader movieReader) {
+            return new CachingMovieReader(cacheManager, movieReader);
+
+        }
 
     }
 
