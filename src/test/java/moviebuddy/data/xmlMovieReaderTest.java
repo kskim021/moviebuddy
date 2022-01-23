@@ -3,12 +3,15 @@ package moviebuddy.data;
 import moviebuddy.MovieBuddyFactory;
 import moviebuddy.MovieBuddyProfile;
 import moviebuddy.domain.Movie;
+import moviebuddy.domain.MovieReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.util.AopTestUtils;
 
 import java.util.List;
 
@@ -18,7 +21,7 @@ import java.util.List;
 public class xmlMovieReaderTest {
 
     @Autowired
-    XmlMovieReader xmlMovieReader;
+    MovieReader xmlMovieReader;
 
     @Test
     void NotEmpty_LoadedMovies() {
@@ -31,5 +34,14 @@ public class xmlMovieReaderTest {
         // MovieFinderTest.assertEquals(1375, movies.size());
 
     }
+
+    @Test
+    void Check_MoviveReaderType() {
+        Assertions.assertTrue(AopUtils.isAopProxy(xmlMovieReader));
+
+        MovieReader target = AopTestUtils.getTargetObject(xmlMovieReader);
+        Assertions.assertTrue(XmlMovieReader.class.isAssignableFrom(target.getClass()));
+    }
+
 
 }

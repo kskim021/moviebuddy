@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class CsvMovieReader extends AbstractMetadataResourceMovieReader implements MovieReader {
 
     //private final Cache<String, List<Movie>> cache;
-    private final CacheManager cacheManager;
+    public CacheManager cacheManager;
 
     /*public CsvMovieReader(Cache<String, List<Movie>> cache) {
         this.cache = Objects.requireNonNull(cache);
@@ -35,6 +35,9 @@ public class CsvMovieReader extends AbstractMetadataResourceMovieReader implemen
         this.cacheManager = Objects.requireNonNull(cacheManager);
     }
 
+    public CsvMovieReader() {
+
+    }
 
     /**
      * 영화 메타데이터를 읽어 저장된 영화 목록을 불러온다.

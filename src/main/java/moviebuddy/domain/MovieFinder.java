@@ -1,6 +1,5 @@
 package moviebuddy.domain;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

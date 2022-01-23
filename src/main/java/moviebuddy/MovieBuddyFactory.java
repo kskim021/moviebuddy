@@ -1,10 +1,13 @@
 package moviebuddy;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import moviebuddy.cache.CachingAdvice;
 import moviebuddy.data.CachingMovieReader;
 import moviebuddy.domain.MovieReader;
+import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
@@ -86,8 +89,21 @@ public class MovieBuddyFactory {
 
         @Primary
         @Bean
-        public MovieReader cachingMovieReader(CacheManager cacheManager, MovieReader movieReader) {
-            return new CachingMovieReader(cacheManager, movieReader);
+        public ProxyFactoryBean cachingMovieReader(ApplicationContext applicationContext) {
+            //return new CachingMovieReader(cacheManager, movieReader);
+
+            MovieReader movieReader = applicationContext.getBean(MovieReader.class);
+            CacheManager cacheManager = applicationContext.getBean(CacheManager.class);
+
+            ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+            proxyFactoryBean.setTarget(movieReader);
+            //  클래스 프락시 비활성화 (프록시 클래스를 두번 호출하는 원리)
+            // proxyFactoryBean.setProxyTargetClass(true);
+
+
+            proxyFactoryBean.addAdvice(new CachingAdvice(cacheManager));
+
+            return proxyFactoryBean;
 
         }
 
