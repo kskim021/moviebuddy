@@ -3,10 +3,7 @@ package moviebuddy;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -16,13 +13,27 @@ import java.util.stream.Stream;
 import moviebuddy.domain.Movie;
 import moviebuddy.domain.MovieFinder;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.*;
+import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.core.env.Environment;
 
 /**
  * @author springrunner.kr@gmail.com
  */
+@Configuration
+@PropertySource("/messages.properties")
 public class MovieBuddyApplication {
+
+    @Bean
+    public MessageSource messageSource() {
+        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        messageSource.setBasename("messages");
+        messageSource.setDefaultEncoding("UTF-8");
+        messageSource.setDefaultLocale(Locale.KOREAN);
+
+        return messageSource;
+    }
 
     public static void main(String[] args) throws Exception {
         new MovieBuddyApplication().run(args);
@@ -39,7 +50,9 @@ public class MovieBuddyApplication {
 
     public void run(String[] args) throws Exception {
 
-        ApplicationContext movieBuddyFactory = new AnnotationConfigApplicationContext(MovieBuddyFactory.class);
+        ApplicationContext movieBuddyFactory = new AnnotationConfigApplicationContext(MovieBuddyFactory.class, MovieBuddyApplication.class);
+        final Environment environment = movieBuddyFactory.getEnvironment();
+        final MessageSource messageSource = movieBuddyFactory.getBean(MessageSource.class);
         //final MovieBuddyFactory movieBuddyFactory = new MovieBuddyFactory();
 
         //final MovieFinder movieFinder = new MovieFinder(new CsvMovieReader());
@@ -56,7 +69,7 @@ public class MovieBuddyApplication {
         final Map<Command, Consumer<List<String>>> commandActions = new HashMap<>();
         // 애플리케이션 종료:: ❯ quit
         commandActions.put(Command.Quit, arguments -> {
-            output.println("quit application.");
+            output.println(messageSource.getMessage("application.commands.quit", new Object[0], Locale.getDefault()));
             running.set(false);
         });
         // 감독으로 영화 검색:: ❯ directedBy Michael Bay
@@ -68,12 +81,12 @@ public class MovieBuddyApplication {
             List<Movie> moviesDirectedBy = movieFinder.directedBy(director);
             AtomicInteger counter = new AtomicInteger(1);
 
-            output.println(String.format("find for movies by %s.", director));
+            output.println(String.format(messageSource.getMessage("application.commands.directedBy", new Object[]{director}, Locale.getDefault())));
             moviesDirectedBy.forEach(it -> {
-                String data = String.format("%d. title: %-50s\treleaseYear: %d\tdirector: %-25s\twatchedDate: %s", counter.getAndIncrement(), it.getTitle(), it.getReleaseYear(), it.getDirector(), it.getWatchedDate().format(Movie.DEFAULT_WATCHED_DATE_FORMATTER));
+                String data = String.format(messageSource.getMessage("application.commands.directedBy.format", new Object[0], Locale.getDefault()), counter.getAndIncrement(), it.getTitle(), it.getReleaseYear(), it.getDirector(), it.getWatchedDate().format(Movie.DEFAULT_WATCHED_DATE_FORMATTER));
                 output.println(data);
             });
-            output.println(String.format("%d movies found.", moviesDirectedBy.size()));
+            output.println(String.format(messageSource.getMessage("application.commands.directedBy.count", new Object[]{moviesDirectedBy.size()}, Locale.getDefault())));
         });
         // 개봉년도로 영화 검색:: ❯ releasedYearBy 2015
         commandActions.put(Command.releasedYearBy, arguments -> {
@@ -97,8 +110,10 @@ public class MovieBuddyApplication {
         /*--------------------------------------------------------------------------------------*/
         /* 사용자가 입력한 값을 해석 후 연결된 명령을 실행한다. */
 
+
         output.println();
-        output.println("application is ready.");
+        output.println(messageSource.getMessage("application.ready", new Object[0], Locale.getDefault()));
+        //output.println(environment.getProperty("application.ready"));
 
         // quit(애플리케이션 종료) 명령어가 입력되기 전까지 무한히 반복하기(infinite loop)
         while (running.get()) {
@@ -119,7 +134,19 @@ public class MovieBuddyApplication {
                 }
                 commandAction.accept(arguments);
             } catch (ApplicationException error) {
-                output.println(error.getMessage());
+                //output.println(error.getMessage());
+
+                /*if(error instanceof ApplicationException.CommandNotFoundException) {
+                    output.println(messageSource.getMessage("application.error.commandNotFoundError", new Object[0], Locale.getDefault()));
+                } else if (error instanceof ApplicationException.UndefinedCommandActionException) {
+
+                } else if () {
+
+                }*/
+
+                String code = String.format("application.errors.%s", error.getClass().getSimpleName());
+                output.println(messageSource.getMessage(code, new Object[0], error.getMessage(), Locale.getDefault()));
+
             } finally {
                 output.flush();
             }
